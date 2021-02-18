@@ -71,7 +71,7 @@
                   </div>
                </div>
                <div class="col-md-12 pt-4 pb-4">
-                  <button type="button" class="btn btn-success check-out">Check Out</button>
+                  <button type="button" id="check-out-button" class="btn btn-success check-out">Check Out</button>
                </div>
             </div>
          </div>
@@ -81,56 +81,87 @@
       //elements
       const phonePriceElement = document.getElementById("phone-price");
       const accessoriesPriceElement = document.getElementById("accessories-price");
-      const subTotalPriceElement = document.getElementById("subtotal") ;
+      const subTotalPriceElement = document.getElementById("subtotal");
       const totalPriceElement = document.getElementById("total");
       const taxPriceElement = document.getElementById("tax");
+      const phoneCountInputElement = document.getElementById("phone-input");
+      const accessoriesCountInputElement = document.getElementById("accessories-input");
 
       //unit prices
-      const phoneUnitPrice = parseInt(phonePriceElement.innerText) ;
+      const phoneUnitPrice = parseInt(phonePriceElement.innerText);
       const accessoriesUnitPrice = parseInt(accessoriesPriceElement.innerText);
 
 
       //phone plus
-      const plusButton = document.getElementById("phone-plus") ;
-      plusButton.addEventListener("click",function(){
-         costChange("phone",phoneUnitPrice,1);
+      const plusButton = document.getElementById("phone-plus");
+      plusButton.addEventListener("click", function () {
+         amountChange("phone", phoneUnitPrice, 1);
+         costCalculate();
       });
 
       //phone minus
       const minusButton = document.getElementById("phone-minus");
-      minusButton.addEventListener("click",function(){
-         costChange("phone",-1*phoneUnitPrice,-1);
+      minusButton.addEventListener("click", function () {
+         amountChange("phone", -1 * phoneUnitPrice, -1);
+         costCalculate();
       });
 
       //accessories
       const accessoriesPlus = document.getElementById("accessories-plus");
-      accessoriesPlus.addEventListener("click",function(){
-         costChange("accessories",accessoriesUnitPrice,1);
+      accessoriesPlus.addEventListener("click", function () {
+         amountChange("accessories", accessoriesUnitPrice, 1);
+         costCalculate();
       });
 
       //accessories minus
       const accessoriesMinus = document.getElementById("accessories-minus");
-      accessoriesMinus.addEventListener("click",function(){
-         costChange("accessories",-1*accessoriesUnitPrice,-1);
+      accessoriesMinus.addEventListener("click", function () {
+         amountChange("accessories", -1 * accessoriesUnitPrice, -1);
+         costCalculate();
       });
-      function costChange(item,amount,count){
-         const inputField = document.getElementById(item+"-input");
-         if(parseInt(inputField.value) + count < (0)) 
-         return ;
+
+      //check-out-button
+      const checkOutButton = document.getElementById("check-out-button");
+      checkOutButton.addEventListener("click", function () {
+         costCalculate();
+      });
+
+      //change the ordered amount
+      function amountChange(item, amount, count) {
+         const inputField = document.getElementById(item + "-input");
          inputField.value = parseInt(inputField.value) + count;
-         //priceSeparate
-         const itemPriceElement = document.getElementById(item+"-price");
-         const itemPrice = Math.abs(amount*inputField.value)
+      }
+
+      function itemCountAndPriceSet(itemCountInputElement,itemUnitPrice,itemPriceElement){
+         const itemCount = parseInt(itemCountInputElement.value);
+         var itemPrice ;
+         if (itemCount < 0) {
+            itemCountInputElement.value = 0;
+            itemPrice = 0;
+         } else {
+            itemPrice = itemUnitPrice * itemCount;
+         }
          itemPriceElement.innerText = itemPrice;
+         return itemPrice ;
+      }
+      //calculate and set total amounts
+      function costCalculate() {
+         //item price count
+         const phonePrice = itemCountAndPriceSet(phoneCountInputElement,phoneUnitPrice,phonePriceElement);
+
+         const accessoriesPrice = itemCountAndPriceSet(accessoriesCountInputElement,accessoriesUnitPrice,accessoriesPriceElement);
+
          //subtotal count
-         const subTotalAmount = parseInt(phonePriceElement.innerText) + parseInt(accessoriesPriceElement.innerText);
-         subTotalPriceElement.innerText = subTotalAmount ;
+         const subTotalAmount = phonePrice + accessoriesPrice;
+         subTotalPriceElement.innerText = subTotalAmount;
+
          //tax count
-         const taxAmount =Math.round(subTotalAmount*.1) ;
-         taxPriceElement.innerText = taxAmount ;
+         const taxAmount = Math.round(subTotalAmount * .1);
+         taxPriceElement.innerText = taxAmount;
+
          //total count
-         const totalAmount = subTotalAmount + taxAmount ;
-         totalPriceElement.innerText = totalAmount ;
+         const totalAmount = subTotalAmount + taxAmount;
+         totalPriceElement.innerText = totalAmount;
       }
    </script>
 </body>
